@@ -2,9 +2,16 @@ game:GetService("RunService").Stepped:Connect(function()
 local args = {
     [1] = "Slam",
     [2] = {
-        ["Power"] = 1.5
+        ["Power"] = 9e999999999999999999999999999999
     }
 }
 firesignal(game:GetService("ReplicatedStorage").Events.TriggerMinigameSkill.OnClientEvent, unpack(args))
 game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Fishing.BarFrame.Bar.Position = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Fishing.BarFrame.Position
 end)
+game:GetService("StarterGui"):SetCore("SendNotification",{
+Title = "Script loaded enjoy!",
+Text = "by rechedmcvn", 
+Button1 = "OK",
+Button2 = "Cancel",
+Duration = 30 
+})
