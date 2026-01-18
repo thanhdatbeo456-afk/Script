@@ -1,0 +1,10 @@
+game:GetService("RunService").Stepped:Connect(function()
+local args = {
+    [1] = "Slam",
+    [2] = {
+        ["Power"] = 1.5
+    }
+}
+firesignal(game:GetService("ReplicatedStorage").Events.TriggerMinigameSkill.OnClientEvent, unpack(args))
+game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Fishing.BarFrame.Bar.Position = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Fishing.BarFrame.Position
+end)
