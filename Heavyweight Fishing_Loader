@@ -12,5 +12,102 @@ Window:AddMinimizeButton({
 })
 
 local Tabs = {
-Farm = Window:MakeTab({"Farm", "home"})
+Main = Window:MakeTab({"Main", "home"}),
+Setting = Window:MakeTab({"Setting", "settings"})
 }
+
+local Farm = Tabs.Main:AddSection({"Farm"})
+Tabs.Main:AddDropdown({
+  Name = "Select Map",
+  Options = {"Map 1", "Map 2", "Map 3", "Map 4"},
+  Default = "Map 1",
+  Callback = function(v)
+_G.SelectMapFarm = v or "Map 1"
+end})
+function NoGravity()
+workspace.Gravity = 0
+wait(1)
+workspace.Gravity = 196.2
+end
+Tabs.Main:AddToggle({
+  Name = "Auto Farm Fish",
+  Default = false,
+  Callback = function(v)
+_G.AutoFarmFish = v
+game:GetService("RunService").RenderStepped:Connect(function()
+if _G.AutoFarmFish == true then
+if _G.SelectMapFarm == "Map 1" then
+NoGravity()
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-76.9656677, 4.39542437, 65.3683777, -0.672856331, -0.0532510914, 0.737854123, 5.51704638e-08, 0.997405827, 0.0719830468, -0.739773214, 0.048434291, -0.671110809)
+elseif _G.SelectMapFarm == "Map 2" then
+NoGravity()
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1457.79431, 14.8344412, 44.5111961, -0.108686604, 0.089548327, -0.990034521, 9.55227961e-07, 0.995934367, 0.0900818631, 0.994076073, 0.00978974625, -0.108244807)
+elseif _G.SelectMapFarm == "Map 3" then
+NoGravity()
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-54.4244728, 16.4847088, 1436.42065, 0.0172436778, 0.0873516351, -0.996028304, 2.60876387e-09, 0.996176422, 0.0873646215, 0.999851346, -0.00150649005, 0.0171777438)
+elseif _G.SelectMapFarm == "Map 4" then
+NoGravity()
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1279.31287, 32.3631744, 1361.77283, -0.108676091, 0.110364988, -0.987931728, -1.22970336e-08, 0.993817866, 0.111022554, 0.994077206, 0.0120655093, -0.108004242)
+end
+end
+end)
+end})
+Tabs.Setting:AddSection({"Setting"})
+Tabs.Setting:AddSlider({
+  Name = "Delay Fishing",
+  Min = 0,
+  Max = 1,
+  Increase = 1,
+  Default = 0.5,
+  Callback = function(v)
+_G.DelayFishing = v
+end})
+Tabs.Setting:AddSlider({
+  Name = "Power Rod",
+  Min = 0,
+  Max = 100,
+  Increase = 1,
+  Default = 1,
+  Callback = function(v)
+_G.PowerRod = v
+end})
+Tabs.Setting:AddToggle({
+  Name = "Auto Power Rod",
+  Default = false,
+  Callback = function(v)
+_G.AutoPowerRod = v
+game:GetService("RunService").RenderStepped:Connect(function()
+if _G.AutoPowerRod then
+local args = {
+    [1] = "Slam",
+    [2] = {
+        ["Power"] = _G.PowerRod or 1
+    }
+}
+firesignal(game:GetService("ReplicatedStorage").Events.TriggerMinigameSkill.OnClientEvent, unpack(args))
+end
+end)
+end})
+Tabs.Setting:AddToggle({
+  Name = "Auto Balance (Fishing Minigame)",
+  Default = true,
+  Callback = function(v)
+_G.AutoBalance = v or true
+game:GetService("RunService").RenderStepped:Connect(function()
+if _G.AutoBalance then
+game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Fishing.BarFrame.Bar.Position = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Fishing.BarFrame.Position
+end
+end)
+end})
+Tabs.Setting:AddToggle({
+  Name = "Auto Fishing",
+  Default = true,
+  Callback = function(v)
+_G.AutoFishing = v or true
+while _G.AutoFishing do
+if workspace[game.Players.LocalPlayer.Name]:GetAttribute("Fishing") == false then
+game:GetService("ReplicatedStorage").Events.Fishing:FireServer()
+end
+wait(_G.DelayFishing or 0.5)
+end
+end})
