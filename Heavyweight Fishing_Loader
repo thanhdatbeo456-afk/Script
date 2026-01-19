@@ -25,6 +25,13 @@ Tabs.Main:AddDropdown({
   Callback = function(v)
 _G.SelectMapFarm = v or "Map 1"
 end})
+local PartFarm = Instance.new("Part", workspace)
+PartFarm.Name = "ThisIsPartFarm"
+PartFarm.Size = Vector3.new(1,1,1)
+PartFarm.Material = "Neon"
+game:GetService("RunService").RenderStepped:Connect(function()
+PartFarm.Color = Color3.fromHSV(tick() % 4/4, 1, 1)
+end)
 Tabs.Main:AddToggle({
   Name = "Auto Farm Fish",
   Default = false,
@@ -34,24 +41,63 @@ game:GetService("RunService").RenderStepped:Connect(function()
 if _G.AutoFarmFish == true then
 if _G.SelectMapFarm == "Map 1" then
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-76.9656677, 4.39542437, 65.3683777, -0.672856331, -0.0532510914, 0.737854123, 5.51704638e-08, 0.997405827, 0.0719830468, -0.739773214, 0.048434291, -0.671110809)
+PartFarm.Position = game.Players.LocalPlayer.Character.HumanoidRootPart.Position - Vector3.new(0,2.75,0)
 elseif _G.SelectMapFarm == "Map 2" then
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1457.79431, 14.8344412, 44.5111961, -0.108686604, 0.089548327, -0.990034521, 9.55227961e-07, 0.995934367, 0.0900818631, 0.994076073, 0.00978974625, -0.108244807)
+PartFarm.Position = game.Players.LocalPlayer.Character.HumanoidRootPart.Position - Vector3.new(0,2.75,0)
 elseif _G.SelectMapFarm == "Map 3" then
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-54.4244728, 16.4847088, 1436.42065, 0.0172436778, 0.0873516351, -0.996028304, 2.60876387e-09, 0.996176422, 0.0873646215, 0.999851346, -0.00150649005, 0.0171777438)
+PartFarm.Position = game.Players.LocalPlayer.Character.HumanoidRootPart.Position - Vector3.new(0,2.75,0)
 elseif _G.SelectMapFarm == "Map 4" then
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1279.31287, 32.3631744, 1361.77283, -0.108676091, 0.110364988, -0.987931728, -1.22970336e-08, 0.993817866, 0.111022554, 0.994077206, 0.0120655093, -0.108004242)
+PartFarm.Position = game.Players.LocalPlayer.Character.HumanoidRootPart.Position - Vector3.new(0,2.75,0)
 end
 end
 end)
 end})
-
+Tabs.Main:AddSection({"Sell"})
+Tabs.Main:AddDropdown({
+  Name = "Select Sell",
+  Options = {"The fish is holding", "All fish"},
+  Default = "The fish is holding",
+  Callback = function(v)
+_G.SelectSell = v or "The fish is holding"
+end})
+Tabs.Main:AddToggle({
+  Name = "Auto Sell",
+  Default = false,
+  Callback = function(v)
+_G.AutoSell = v
+game:GetService("RunService").RenderStepped:Connect(function()
+if _G.AutoSell then
+if _G.SelectSell == "The fish is holding" then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("SellFish"):FireServer("One")
+elseif _G.SelectSell == "All fish" then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("SellFish"):FireServer("All")
+end
+end
+end)
+end})
+Tabs.Main:AddSection({"Skill"})
+Tabs.Main:AddDropdown({
+  Name = "Select Skill",
+  Options = {"Z", "X", "C", "V"},
+  Default = "Z",
+  Callback = function(v)
+_G.SelectSkill = v or "Z"
+end})
+Tabs.Main:AddToggle({
+  Name = "Auto Use Skill",
+  Default = false,
+  Callback = function(v)
+_G.AutoSkill = v
+game:GetService("RunService").RenderStepped:Connect(function()
+if _G.AutoSkill then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("UseSkill"):FireServer(_G.SelectSkill or "Z")
+end
+end)
+end})
 Tabs.Shop:AddSection({"Rod"})
-
-Ascendant Bamboo Rod 15G
-Blazeshark Rod 35G
-]]--
-
-
 Tabs.Shop:AddDropdown({
   Name = "Select Rod",
   Options = {"Bamboo Rod (500$)", "Iron Hook Rod (1K$)", "Steel Rod (1K5$)", "Enchanted Steel Rod (2K5$)", "Alloy Rod (5K$)", "Emerald Rod (10K$)", "Bloodfire Rod (20K$)", "Shadow Rod (60K$)", "Triple Steel Rod (150K$)", "Golden Rod (220K$)", "Grandmaster Steel Rod (500K$)", "Grandmaster Emerald Rod (1M$)", "Inferno Rod (2M$)", "Grandmaster Golden Rod (3M$)"},
