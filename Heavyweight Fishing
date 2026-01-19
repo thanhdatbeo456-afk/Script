@@ -2,12 +2,25 @@ game:GetService("RunService").Stepped:Connect(function()
 local args = {
     [1] = "Slam",
     [2] = {
-        ["Power"] = 9e999999999999999999999999999999
+        ["Power"] = _G.Power or 9e9
     }
 }
 firesignal(game:GetService("ReplicatedStorage").Events.TriggerMinigameSkill.OnClientEvent, unpack(args))
 game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Fishing.BarFrame.Bar.Position = game:GetService("Players").LocalPlayer.PlayerGui.MainGui.Fishing.BarFrame.Position
 end)
+task.spawn(function()
+while true do
+if workspace[game.Players.LocalPlayer.Name]:GetAttribute("Fishing") == false then
+game:GetService("ReplicatedStorage").Events.Fishing:FireServer()
+end
+wait(0.5)
+end
+end)
+for _,v in ipairs(game:GetService("ReplicatedStorage").Data[game.Players.LocalPlayer.UserId].Gamepass:GetChildren()) do
+if v.Parent.Name == "Gamepass" then
+v.Value = true
+end
+end
 game:GetService("StarterGui"):SetCore("SendNotification",{
 Title = "Script loaded enjoy!",
 Text = "by rechedmcvn", 
