@@ -1,1 +1,16 @@
+local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/tbao143/Library-ui/refs/heads/main/Redzhubui"))()
 
+local Window = redzlib:MakeWindow({
+  Title = "Heavyweight Fishing",
+  SubTitle = "v0.1",
+  SaveFolder = "testando | redz lib v5.lua"
+})
+
+Window:AddMinimizeButton({
+    Button = { Image = "", BackgroundTransparency = 0 },
+    Corner = { CornerRadius = UDim.new(35, 1) },
+})
+
+local Tabs = {
+Farm = Window:MakeTab({"Farm", "home"})
+}
