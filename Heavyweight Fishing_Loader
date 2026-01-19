@@ -1,9 +1,9 @@
-local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/tbao143/Library-ui/refs/heads/main/Redzhubui"))()
+local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/AnhDangNhoEm/UiRedz/refs/heads/main/RedzUiV.txt"))()
 
 local Window = redzlib:MakeWindow({
   Title = "Heavyweight Fishing",
   SubTitle = "v0.1",
-  SaveFolder = "testando | redz lib v5.lua"
+  SaveFolder = "Redz | redz lib v5.lua"
 })
 
 Window:AddMinimizeButton({
