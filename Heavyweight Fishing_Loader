@@ -13,10 +13,11 @@ Window:AddMinimizeButton({
 
 local Tabs = {
 Main = Window:MakeTab({"Main", "home"}),
+Shop = Window:MakeTab({"Shop", "coin"}),
 Setting = Window:MakeTab({"Setting", "settings"})
 }
 
-local Farm = Tabs.Main:AddSection({"Farm"})
+Tabs.Main:AddSection({"Farm"})
 Tabs.Main:AddDropdown({
   Name = "Select Map",
   Options = {"Map 1", "Map 2", "Map 3", "Map 4"},
@@ -24,11 +25,6 @@ Tabs.Main:AddDropdown({
   Callback = function(v)
 _G.SelectMapFarm = v or "Map 1"
 end})
-function NoGravity()
-workspace.Gravity = 0
-wait(1)
-workspace.Gravity = 196.2
-end
 Tabs.Main:AddToggle({
   Name = "Auto Farm Fish",
   Default = false,
@@ -37,21 +33,95 @@ _G.AutoFarmFish = v
 game:GetService("RunService").RenderStepped:Connect(function()
 if _G.AutoFarmFish == true then
 if _G.SelectMapFarm == "Map 1" then
-NoGravity()
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-76.9656677, 4.39542437, 65.3683777, -0.672856331, -0.0532510914, 0.737854123, 5.51704638e-08, 0.997405827, 0.0719830468, -0.739773214, 0.048434291, -0.671110809)
 elseif _G.SelectMapFarm == "Map 2" then
-NoGravity()
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1457.79431, 14.8344412, 44.5111961, -0.108686604, 0.089548327, -0.990034521, 9.55227961e-07, 0.995934367, 0.0900818631, 0.994076073, 0.00978974625, -0.108244807)
 elseif _G.SelectMapFarm == "Map 3" then
-NoGravity()
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-54.4244728, 16.4847088, 1436.42065, 0.0172436778, 0.0873516351, -0.996028304, 2.60876387e-09, 0.996176422, 0.0873646215, 0.999851346, -0.00150649005, 0.0171777438)
 elseif _G.SelectMapFarm == "Map 4" then
-NoGravity()
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-1279.31287, 32.3631744, 1361.77283, -0.108676091, 0.110364988, -0.987931728, -1.22970336e-08, 0.993817866, 0.111022554, 0.994077206, 0.0120655093, -0.108004242)
 end
 end
 end)
 end})
+
+Tabs.Shop:AddSection({"Rod"})
+
+Ascendant Bamboo Rod 15G
+Blazeshark Rod 35G
+]]--
+
+
+Tabs.Shop:AddDropdown({
+  Name = "Select Rod",
+  Options = {"Bamboo Rod (500$)", "Iron Hook Rod (1K$)", "Steel Rod (1K5$)", "Enchanted Steel Rod (2K5$)", "Alloy Rod (5K$)", "Emerald Rod (10K$)", "Bloodfire Rod (20K$)", "Shadow Rod (60K$)", "Triple Steel Rod (150K$)", "Golden Rod (220K$)", "Grandmaster Steel Rod (500K$)", "Grandmaster Emerald Rod (1M$)", "Inferno Rod (2M$)", "Grandmaster Golden Rod (3M$)"},
+  Default = "Bamboo Rod (500$)",
+  Callback = function(v)
+_G.SelectRod = v or "Bamboo Rod (500$)"
+end})
+Tabs.Shop:AddToggle({
+  Name = "Auto Buy Rod",
+  Default = false,
+  Callback = function(v)
+_G.AutoBuyRod = v
+game:GetService("RunService").RenderStepped:Connect(function()
+if _G.AutoBuyRod then
+if _G.SelectRod == "Bamboo Rod (500$)" then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("BuyFishingRod"):FireServer("Bamboo Rod")
+elseif _G.SelectRod == "Iron Hook Rod (1K$)" then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("BuyFishingRod"):FireServer("Iron Hook Rod")
+elseif _G.SelectRod == "Steel Rod (1K5$)" then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("BuyFishingRod"):FireServer("Steel Rod")
+elseif _G.SelectRod == "Enchanted Steel Rod (2K5$)" then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("BuyFishingRod"):FireServer("Enchanted Steel Rod")
+elseif _G.SelectRod == "Alloy Rod (5K$)" then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("BuyFishingRod"):FireServer("Alloy Rod")
+elseif _G.SelectRod == "Emerald Rod (10K$)" then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("BuyFishingRod"):FireServer("Emerald Rod")
+elseif _G.SelectRod == "Bloodfire Rod (20K$)" then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("BuyFishingRod"):FireServer("Bloodfire Rod")
+elseif _G.SelectRod == "Shadow Rod (60K$)" then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("BuyFishingRod"):FireServer("Shadow Rod")
+elseif _G.SelectRod == "Triple Steel Rod (150K$)" then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("BuyFishingRod"):FireServer("Triple Steel Rod")
+elseif _G.SelectRod == "Golden Rod (220K$)" then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("BuyFishingRod"):FireServer("Golden Rod")
+elseif _G.SelectRod == "Grandmaster Steel Rod (500K$)" then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("BuyFishingRod"):FireServer("Grandmaster Steel Rod")
+elseif _G.SelectRod == "Grandmaster Emerald Rod (1M$)" then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("BuyFishingRod"):FireServer("Grandmaster Emerald Rod")
+elseif _G.SelectRod == "Inferno Rod (2M$)" then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("BuyFishingRod"):FireServer("Inferno Rod")
+elseif _G.SelectRod == "Grandmaster Golden Rod (3M$)" then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("BuyFishingRod"):FireServer("Grandmaster Golden Rod")
+end
+end
+end)
+end})
+Tabs.Shop:AddSection({"Serect Rod"})
+Tabs.Shop:AddDropdown({
+  Name = "Select Serect Rod",
+  Options = {"Ascendant Bamboo Rod (15€)", "Blazeshark Rod (35€)"},
+  Default = "Ascendant Bamboo Rod (15€)",
+  Callback = function(v)
+_G.SelectSerectRod = v or "Ascendant Bamboo Rod (15€)"
+end})
+Tabs.Shop:AddToggle({
+  Name = "Auto Buy Serect Rod",
+  Default = false,
+  Callback = function(v)
+_G.AutoBuySerectRod = v
+game:GetService("RunService").RenderStepped:Connect(function()
+if _G.AutoBuySerectRod then
+if _G.SelectSerectRod == "Ascendant Bamboo Rod (15€)" then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("BuyFishingRod"):FireServer("Ascendant Bamboo Rod")
+elseif _G.SelectSerectRod == "Blazeshark Rod (35€)" then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("BuyFishingRod"):FireServer("Blazeshark Rod")
+end
+end
+end)
+end})
+
 Tabs.Setting:AddSection({"Setting"})
 Tabs.Setting:AddSlider({
   Name = "Delay Fishing",
@@ -104,7 +174,7 @@ Tabs.Setting:AddToggle({
   Default = true,
   Callback = function(v)
 _G.AutoFishing = v or true
-while _G.AutoFishing do
+while _G.AutoFarmFish and _G.AutoFishing do
 if workspace[game.Players.LocalPlayer.Name]:GetAttribute("Fishing") == false then
 game:GetService("ReplicatedStorage").Events.Fishing:FireServer()
 end
