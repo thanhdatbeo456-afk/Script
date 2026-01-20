@@ -1402,7 +1402,7 @@ local function MakeRounded(parent)
 		Image = "rbxassetid://5761488251",
 		ScaleType = Enum.ScaleType.Slice,
 		SliceCenter = Rect.new(2, 2, 298, 298),
-		ImageColor3 = Color3.fromRGB(30, 30, 30),
+		ImageColor3 = Theme["Color Hub 2"],
 		BackgroundTransparency = 1,
 		Parent = parent
 	})
