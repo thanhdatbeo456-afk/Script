@@ -14,6 +14,7 @@ Window:AddMinimizeButton({
 local Tabs = {
 Main = Window:MakeTab({"Main", "home"}),
 Shop = Window:MakeTab({"Shop", "coin"}),
+Teleport = Window:MakeTab({"Teleport", "compass"})
 Setting = Window:MakeTab({"Setting", "settings"})
 }
 
@@ -168,6 +169,41 @@ end
 end)
 end})
 
+Tabs.Teleport:AddSection({"Island"})
+Tabs.Teleport:AddDropdown({
+  Name = "Select Island",
+  Options = {"Map 1", "Map 2", "Map 3", "Map 4"},
+  Default = "Map 1",
+  Callback = function(v)
+_G.SelectIsland = v or "Map 1"
+end})
+local TeleportMapToggle = Tabs.Teleport:AddToggle({
+  Name = "Teleport Island",
+  Default = false,
+  Callback = function(v)
+_G.TeleportIsland = v
+game:GetService("RunService").RenderStepped:Connect(function()
+if _G.TeleportIsland then
+if _G.SelectIsland == "Map 1" then
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.NPC.SellFish.Nana1 - Vector3.new(0,0,-10)
+wait(1)
+TeleportMapToggle:Set(false)
+elseif _G.SelectIsland == "Map 2" then
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.NPC.SellFish.Nana2 - Vector3.new(0,0,-10)
+wait(1)
+TeleportMapToggle:Set(false)
+elseif _G.SelectIsland == "Map 3" then
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.NPC.SellFish.Nana3 - Vector3.new(0,0,-10)
+wait(1)
+TeleportMapToggle:Set(false)
+elseif _G.SelectIsland == "Map 4" then
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.NPC.SellFish.Nana4 - Vector3.new(0,0,-10)
+wait(1)
+TeleportMapToggle:Set(false)
+end
+end
+end)
+end})
 Tabs.Setting:AddSection({"Setting"})
 Tabs.Setting:AddSlider({
   Name = "Delay Fishing",
