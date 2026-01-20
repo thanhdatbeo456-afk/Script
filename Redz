@@ -18,7 +18,7 @@ local redzlib = {
             }),
             ["Color Hub 2"] = Color3.fromRGB(20, 20, 20),
             ["Color Stroke"] = Color3.fromRGB(15, 15, 15),
-            ["Color Theme"] = Color3.fromRGB(255, 20, 200),
+            ["Color Theme"] = Color3.fromRGB(200, 20, 135),
             ["Color Text"] = Color3.fromRGB(255, 255, 255),
             ["Color Dark Text"] = Color3.fromRGB(120, 120, 120)
         }
@@ -1409,7 +1409,11 @@ function redzlib:MakeWindow(Configs)
 	})MakeDrag(MainFrame)
 	
 	local MainCorner = Make("Corner", MainFrame)
-	
+
+    local MainStroke = Create("UIStroke", MainFrame, {
+        Color = Theme["Color Theme"]
+    })
+    
 	local Components = Create("Folder", MainFrame, {
 		Name = "Components"
 	})
@@ -1597,7 +1601,9 @@ function redzlib:MakeWindow(Configs)
 			BackgroundColor3 = Theme["Color Hub 2"],
 			AutoButtonColor = false
 		}))
-		
+		local UIStroke = Create("UIStroke", Button, {
+            Color = Theme["Color Theme"]
+        })
 		local Stroke, Corner
 		if Configs.Corner then
 			Corner = Make("Corner", Button)
