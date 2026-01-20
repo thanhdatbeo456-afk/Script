@@ -14,7 +14,7 @@ Window:AddMinimizeButton({
 local Tabs = {
 Main = Window:MakeTab({"Main", "home"}),
 Shop = Window:MakeTab({"Shop", "coin"}),
-Teleport = Window:MakeTab({"Teleport", "compass"})
+Teleport = Window:MakeTab({"Teleport", "compass"}),
 Setting = Window:MakeTab({"Setting", "settings"})
 }
 
