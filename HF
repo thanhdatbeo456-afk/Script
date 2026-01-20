@@ -1,4 +1,4 @@
-local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/thanhdatbeo456-afk/Ui_Library/refs/heads/main/redz%20ui.lua"))()
+local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/thanhdatbeo456-afk/Script/refs/heads/main/Redz"))()
 
 local Window = redzlib:MakeWindow({
   Title = "Heavyweight Fishing",
