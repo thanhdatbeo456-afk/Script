@@ -2696,7 +2696,8 @@ end
 			function Slider:Destroy() Button:Destroy() end
 			return Slider
 		end
-function Tab:AddColorPicker(Configs)
+
+    function Tab:AddColorPicker(Configs)
     local CName = Configs[1] or Configs.Name or Configs.Title or "Color Picker"
     local CDesc = Configs.Desc or Configs.Description or ""
     local Callback = Funcs:GetCallback(Configs, 3)
@@ -2837,6 +2838,11 @@ function Tab:AddColorPicker(Configs)
             PickerPanel.Visible = not PickerPanel.Visible
         end
     end)
+
+    local ColorPicker = {}
+    function ColorPicker:Set(col) h, s, v = Color3.toHSV(col) UpdateColor(true) end
+
+    return ColorPicker
 end
 		function Tab:AddTextBox(Configs)
 			local TName = Configs[1] or Configs.Name or Configs.Title or "Text Box"
