@@ -2696,8 +2696,7 @@ end
 			function Slider:Destroy() Button:Destroy() end
 			return Slider
 		end
-
-    function Tab:AddColorPicker(Configs)
+function Tab:AddColorPicker(Configs)
     local CName = Configs[1] or Configs.Name or Configs.Title or "Color Picker"
     local CDesc = Configs.Desc or Configs.Description or ""
     local Callback = Funcs:GetCallback(Configs, 3)
@@ -2708,13 +2707,13 @@ end
     
     local Button, LabelFunc = ButtonFrame(Container, CName, CDesc, UDim2.new(1, -38))
     
-    local ColorSquare = Create("Frame", Button, {
-        Size = UDim2.new(0, 24, 0, 14),
-        Position = UDim2.new(1, -12, 0.5),
+    local ColorIcon = Create("ImageButton", Button, {
+        Size = UDim2.new(0, 20, 0, 20),
+        Position = UDim2.new(1, -10, 0.5),
         AnchorPoint = Vector2.new(1, 0.5),
-        BackgroundColor3 = Default,
-        BorderSizePixel = 1,
-        BorderColor3 = Color3.fromRGB(0, 0, 0)
+        BackgroundTransparency = 1,
+        Image = "rbxassetid://10734942201", -- Icon cái xô màu
+        ImageColor3 = Default
     })
     
     local PickerPanel = Create("Frame", NotifGui, {
@@ -2780,7 +2779,7 @@ end
     local function UpdateColor(isCallback)
         local FinalColor = Color3.fromHSV(h, s, v)
         SatGrid.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
-        ColorSquare.BackgroundColor3 = FinalColor
+        ColorIcon.ImageColor3 = FinalColor
         Cursor.Position = UDim2.fromScale(s, 1 - v)
         HueCursor.Position = UDim2.fromScale(0.5, 1 - h)
         
@@ -2804,46 +2803,66 @@ end
         end
     end)
 
-    SatGrid.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            local con; con = RunService.RenderStepped:Connect(function()
-                local m = UserInputService:GetMouseLocation()
-                s = math.clamp((m.X - SatGrid.AbsolutePosition.X) / SatGrid.AbsoluteSize.X, 0, 1)
-                v = 1 - math.clamp((m.Y - 36 - SatGrid.AbsolutePosition.Y) / SatGrid.AbsoluteSize.Y, 0, 1)
-                UpdateColor(true)
-                if not UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then con:Disconnect() end
-            end)
-        end
-    end)
-
-    HueSlider.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            if isRainbow then 
-                isRainbow = false
-                RainbowBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-                if RainbowConnection then RainbowConnection:Disconnect() end
+    local function HandleInput(obj, callback)
+        obj.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                local connection
+                connection = RunService.RenderStepped:Connect(function()
+                    local inputPos = UserInputService:GetMouseLocation()
+                    callback(inputPos)
+                    local isPressed = UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) or 
+                                      #UserInputService:GetNavigationGamepads() > 0 -- Touch check via state
+                    if not isPressed and input.UserInputState == Enum.UserInputState.End then
+                        connection:Disconnect()
+                    end
+                end)
+                input.Changed:Connect(function()
+                    if input.UserInputState == Enum.UserInputState.End then connection:Disconnect() end
+                end)
             end
-            local con; con = RunService.RenderStepped:Connect(function()
-                local m = UserInputService:GetMouseLocation()
-                h = 1 - math.clamp((m.Y - 36 - HueSlider.AbsolutePosition.Y) / HueSlider.AbsoluteSize.Y, 0, 1)
-                UpdateColor(true)
-                if not UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then con:Disconnect() end
-            end)
-        end
+        end)
+    end
+
+    HandleInput(SatGrid, function(m)
+        s = math.clamp((m.X - SatGrid.AbsolutePosition.X) / SatGrid.AbsoluteSize.X, 0, 1)
+        v = 1 - math.clamp((m.Y - 36 - SatGrid.AbsolutePosition.Y) / SatGrid.AbsoluteSize.Y, 0, 1)
+        UpdateColor(true)
     end)
 
-    ColorSquare.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            PickerPanel.Position = UDim2.fromOffset(ColorSquare.AbsolutePosition.X + 30, ColorSquare.AbsolutePosition.Y)
-            PickerPanel.Visible = not PickerPanel.Visible
+    HandleInput(HueSlider, function(m)
+        if isRainbow then 
+            isRainbow = false
+            RainbowBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+            if RainbowConnection then RainbowConnection:Disconnect() end
+        end
+        h = 1 - math.clamp((m.Y - 36 - HueSlider.AbsolutePosition.Y) / HueSlider.AbsoluteSize.Y, 0, 1)
+        UpdateColor(true)
+    end)
+
+    ColorIcon.MouseButton1Click:Connect(function()
+        local pos = ColorIcon.AbsolutePosition
+        PickerPanel.Position = UDim2.fromOffset(pos.X - 220, pos.Y)
+        PickerPanel.Visible = not PickerPanel.Visible
+    end)
+
+    UserInputService.InputBegan:Connect(function(input)
+        if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and PickerPanel.Visible then
+            local m = UserInputService:GetMouseLocation()
+            local p, s_p = PickerPanel.AbsolutePosition, PickerPanel.AbsoluteSize
+            local inPanel = m.X >= p.X and m.X <= p.X + s_p.X and m.Y >= p.Y + 36 and m.Y <= p.Y + s_p.Y + 36
+            
+            local iconP, iconS = ColorIcon.AbsolutePosition, ColorIcon.AbsoluteSize
+            local inIcon = m.X >= iconP.X and m.X <= iconP.X + iconS.X and m.Y >= iconP.Y + 36 and m.Y <= iconP.Y + iconS.Y + 36
+            
+            if not inPanel and not inIcon then PickerPanel.Visible = false end
         end
     end)
 
     local ColorPicker = {}
     function ColorPicker:Set(col) h, s, v = Color3.toHSV(col) UpdateColor(true) end
-
     return ColorPicker
 end
+                    
 		function Tab:AddTextBox(Configs)
 			local TName = Configs[1] or Configs.Name or Configs.Title or "Text Box"
 			local TDesc = Configs.Desc or Configs.Description or ""
