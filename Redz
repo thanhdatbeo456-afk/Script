@@ -2065,6 +2065,84 @@ function redzlib:MakeWindow(Configs)
 			end
 			return Button
 		end
+function Tab:AddCheckbox(Configs)
+    local TName = Configs[1] or Configs.Name or Configs.Title or "Checkbox"
+    local TDesc = Configs.Desc or Configs.Description or ""
+    local Callback = Funcs:GetCallback(Configs, 3)
+    local Flag = Configs[4] or Configs.Flag or false
+    local Default = Configs[2] or Configs.Default or false
+    
+    if CheckFlag(Flag) then Default = GetFlag(Flag) end
+    
+    local Button, LabelFunc = ButtonFrame(Container, TName, TDesc, UDim2.new(1, -38))
+    
+    local CheckboxHolder = InsertTheme(Create("Frame", Button, {
+        Size = UDim2.new(0, 20, 0, 20),
+        Position = UDim2.new(1, -10, 0.5),
+        AnchorPoint = Vector2.new(1, 0.5),
+        BackgroundColor3 = Theme["Color Stroke"],
+        BorderSizePixel = 0
+    }), "Stroke")
+    Make("Corner", CheckboxHolder, UDim.new(0, 4)) -- Bo góc nhẹ cho checkbox
+    
+    local CheckMark = InsertTheme(Create("Frame", CheckboxHolder, {
+        Size = UDim2.new(0, 0, 0, 0), -- Bắt đầu từ 0 để tạo hiệu ứng bung ra
+        Position = UDim2.new(0.5, 0, 0.5, 0),
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        BackgroundColor3 = Theme["Color Theme"],
+        BorderSizePixel = 0
+    }), "Theme")
+    Make("Corner", CheckMark, UDim.new(0, 3))
+    
+    local WaitClick = false
+    local function SetCheckbox(Val)
+        if WaitClick then return end
+        WaitClick, Default = true, Val
+        
+        SetFlag(Flag, Default)
+        Funcs:FireCallback(Callback, Default)
+        
+        if Default then
+            CreateTween({CheckMark, "Size", UDim2.new(0.7, 0, 0.7, 0), 0.2})
+            CreateTween({CheckMark, "BackgroundTransparency", 0, 0.2})
+            CreateTween({CheckboxHolder, "BackgroundTransparency", 0, 0.2})
+        else
+            CreateTween({CheckMark, "Size", UDim2.new(0, 0, 0, 0), 0.2})
+            CreateTween({CheckMark, "BackgroundTransparency", 1, 0.2})
+            CreateTween({CheckboxHolder, "BackgroundTransparency", 0.5, 0.2})
+        end
+        WaitClick = false
+    end
+    
+    task.spawn(SetCheckbox, Default)
+    
+    Button.Activated:Connect(function()
+        SetCheckbox(not Default)
+    end)
+    
+    local Checkbox = {}
+    function Checkbox:Visible(...) Funcs:CheckboxVisible(Button, ...) end
+    function Checkbox:Destroy() Button:Destroy() end
+    function Checkbox:Callback(...) Funcs:InsertCallback(Callback, ...)() end
+    
+    function Checkbox:Set(Val1, Val2)
+        if type(Val1) == "string" and type(Val2) == "string" then
+            LabelFunc:SetTitle(Val1)
+            LabelFunc:SetDesc(Val2)
+        elseif type(Val1) == "string" then
+            LabelFunc:SetTitle(Val1, false, true)
+        elseif type(Val1) == "boolean" then
+            if WaitClick and Val2 then
+                repeat task.wait() until not WaitClick
+            end
+            task.spawn(SetToggle, Val1)
+        elseif type(Val1) == "function" then
+            Callback = Val1
+        end
+    end
+
+    return Checkbox
+end
 		function Tab:AddToggle(Configs)
 			local TName = Configs[1] or Configs.Name or Configs.Title or "Toggle"
 			local TDesc = Configs.Desc or Configs.Description or ""
