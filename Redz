@@ -2696,6 +2696,163 @@ end
 			function Slider:Destroy() Button:Destroy() end
 			return Slider
 		end
+function Tab:AddColorPicker(Configs)
+    local CName = Configs[1] or Configs.Name or Configs.Title or "Color Picker"
+    local CDesc = Configs.Desc or Configs.Description or ""
+    local Callback = Funcs:GetCallback(Configs, 3)
+    local Flag = Configs[4] or Configs.Flag or false
+    local Default = Configs[2] or Configs.Default or Color3.fromRGB(0, 170, 255)
+    
+    if CheckFlag(Flag) then Default = GetFlag(Flag) end
+    
+    local Button, LabelFunc = ButtonFrame(Container, CName, CDesc, UDim2.new(1, -38))
+    
+    local Preview = Create("Frame", Button, {
+        Size = UDim2.new(0, 24, 0, 24),
+        Position = UDim2.new(1, -10, 0.5),
+        AnchorPoint = Vector2.new(1, 0.5),
+        BackgroundColor3 = Default,
+        BorderSizePixel = 0
+    })
+    Make("Corner", Preview, UDim.new(0, 4))
+    
+    local PickerPanel = Create("Frame", Button, {
+        Size = UDim2.new(1, -20, 0, 0),
+        Position = UDim2.new(0.5, 0, 1, 5),
+        AnchorPoint = Vector2.new(0.5, 0),
+        BackgroundColor3 = Theme["Color Stroke"],
+        ClipsDescendants = true,
+        Visible = false,
+        ZIndex = 10
+    })
+    Make("Corner", PickerPanel, UDim.new(0, 6))
+
+    local h, s, v = Color3.toHSV(Default)
+    local RainbowConnection = nil
+
+    local SatGrid = Create("ImageLabel", PickerPanel, {
+        Size = UDim2.new(0, 150, 0, 100),
+        Position = UDim2.fromOffset(10, 10),
+        Image = "rbxassetid://4155801252",
+        BackgroundColor3 = Color3.fromHSV(h, 1, 1),
+        BorderSizePixel = 0
+    })
+
+    local Cursor = Create("ImageLabel", SatGrid, {
+        Size = UDim2.fromOffset(12, 12),
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        BackgroundTransparency = 1,
+        Image = "http://www.roblox.com/asset/?id=4805639000",
+        ImageColor3 = Color3.new(1, 1, 1),
+        Position = UDim2.fromScale(s, 1 - v),
+        ZIndex = 12
+    })
+
+    local HueSlider = Create("ImageLabel", PickerPanel, {
+        Size = UDim2.new(0, 20, 0, 100),
+        Position = UDim2.fromOffset(170, 10),
+        Image = "rbxassetid://4155806340",
+        BorderSizePixel = 0
+    })
+    
+    local HueCursor = Create("Frame", HueSlider, {
+        Size = UDim2.new(1, 4, 0, 2),
+        Position = UDim2.fromScale(0.5, 1 - h),
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        BackgroundColor3 = Color3.new(1, 1, 1),
+        ZIndex = 11
+    })
+
+    local RainbowBtn = Create("TextButton", PickerPanel, {
+        Size = UDim2.new(0, 70, 0, 20),
+        Position = UDim2.fromOffset(200, 10),
+        BackgroundColor3 = Color3.fromRGB(60, 60, 60),
+        Text = "Rainbow",
+        TextColor3 = Color3.new(1, 1, 1),
+        Font = Enum.Font.Gotham,
+        TextSize = 12
+    })
+    Make("Corner", RainbowBtn, UDim.new(0, 4))
+
+    local function UpdateColor(isCallback)
+        local FinalColor = Color3.fromHSV(h, s, v)
+        SatGrid.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
+        Preview.BackgroundColor3 = FinalColor
+        Cursor.Position = UDim2.fromScale(s, 1 - v)
+        HueCursor.Position = UDim2.fromScale(0.5, 1 - h)
+        
+        if isCallback then
+            SetFlag(Flag, FinalColor)
+            Funcs:FireCallback(Callback, FinalColor)
+        end
+    end
+
+    local isRainbow = false
+    RainbowBtn.MouseButton1Click:Connect(function()
+        isRainbow = not isRainbow
+        RainbowBtn.BackgroundColor3 = isRainbow and Theme["Color Theme"] or Color3.fromRGB(60, 60, 60)
+        
+        if isRainbow then
+            RainbowConnection = RunService.RenderStepped:Connect(function()
+                h = (tick() % 5) / 5
+                UpdateColor(true)
+            end)
+        else
+            if RainbowConnection then RainbowConnection:Disconnect() end
+        end
+    end)
+
+    SatGrid.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            local con; con = RunService.RenderStepped:Connect(function()
+                local m = UserInputService:GetMouseLocation()
+                s = math.clamp((m.X - SatGrid.AbsolutePosition.X) / SatGrid.AbsoluteSize.X, 0, 1)
+                v = 1 - math.clamp((m.Y - 36 - SatGrid.AbsolutePosition.Y) / SatGrid.AbsoluteSize.Y, 0, 1)
+                UpdateColor(true)
+                if not UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then con:Disconnect() end
+            end)
+        end
+    end)
+
+    HueSlider.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            if isRainbow then 
+                isRainbow = false
+                RainbowBtn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+                if RainbowConnection then RainbowConnection:Disconnect() end
+            end
+            local con; con = RunService.RenderStepped:Connect(function()
+                local m = UserInputService:GetMouseLocation()
+                h = 1 - math.clamp((m.Y - 36 - HueSlider.AbsolutePosition.Y) / HueSlider.AbsoluteSize.Y, 0, 1)
+                UpdateColor(true)
+                if not UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then con:Disconnect() end
+            end)
+        end
+    end)
+
+    local Open = false
+    Button.Activated:Connect(function()
+        Open = not Open
+        PickerPanel.Visible = true
+        CreateTween({PickerPanel, "Size", Open and UDim2.new(1, -20, 0, 120) or UDim2.new(1, -20, 0, 0), 0.2})
+        if not Open then task.delay(0.2, function() if not Open then PickerPanel.Visible = false end end) end
+    end)
+
+    local ColorPicker = {}
+    function ColorPicker:Set(col) h, s, v = Color3.toHSV(col) UpdateColor(true) end
+    function ColorPicker:Visible(...) Funcs:ToggleVisible(Button, ...) end
+    function ColorPicker:Destroy() Button:Destroy() end
+
+    function ColorPicker:AddToggle(C) return Tab:AddToggle(C) end
+    function ColorPicker:AddSlider(C) return Tab:AddSlider(C) end
+    function ColorPicker:AddButton(C) return Tab:AddButton(C) end
+    function ColorPicker:AddDropdown(C) return Tab:AddDropdown(C) end
+    function ColorPicker:AddMultiDropdown(C) return Tab:AddMultiDropdown(C) end
+    function ColorPicker:AddKeybind(C) return Tab:AddKeybind(C) end
+    function ColorPicker:AddDivider() return Tab:AddDivider() end
+
+    return ColorPicker
+end
 		function Tab:AddTextBox(Configs)
 			local TName = Configs[1] or Configs.Name or Configs.Title or "Text Box"
 			local TDesc = Configs.Desc or Configs.Description or ""
