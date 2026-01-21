@@ -2696,7 +2696,8 @@ end
 			function Slider:Destroy() Button:Destroy() end
 			return Slider
 		end
-function Tab:AddColorPicker(Configs)
+
+    function Tab:AddColorPicker(Configs)
     local CName = Configs[1] or Configs.Name or Configs.Title or "Color Picker"
     local CDesc = Configs.Desc or Configs.Description or ""
     local Callback = Funcs:GetCallback(Configs, 3)
@@ -2721,15 +2722,15 @@ function Tab:AddColorPicker(Configs)
         Size = UDim2.new(0, 210, 0, 155),
         BackgroundColor3 = Color3.fromRGB(20, 20, 20),
         BorderSizePixel = 1,
-        BorderColor3 = Default, -- Viền bảng màu khởi tạo theo Default
+        BorderColor3 = Color3.fromRGB(60, 60, 60),
         Visible = false,
         ZIndex = 200
     })
     Make("Corner", PickerPanel, UDim.new(0, 4))
 
     local h, s, v = Color3.toHSV(Default)
-    local RainbowConnection = nil
     local IsRainbow = false
+    local RainbowConnection
 
     local SatGrid = Create("ImageLabel", PickerPanel, {
         Size = UDim2.new(0, 150, 0, 120),
@@ -2756,12 +2757,26 @@ function Tab:AddColorPicker(Configs)
         ZIndex = 201
     })
     
-    local HueCursor = Create("Frame", HueSlider, {
-        Size = UDim2.new(1, 4, 0, 2),
+    -- Thanh xám bên trong (Hue Cursor) có màu Gradient
+    local HueCursorBase = Create("Frame", HueSlider, {
+        Size = UDim2.new(1, 4, 0, 4),
         Position = UDim2.fromScale(0.5, 1 - h),
         AnchorPoint = Vector2.new(0.5, 0.5),
-        BackgroundColor3 = Default, -- Thanh trượt đổi màu
+        BackgroundColor3 = Color3.fromRGB(40, 40, 40), -- Màu xám nền
+        BorderSizePixel = 0,
         ZIndex = 205
+    })
+    Make("Corner", HueCursorBase, UDim.new(0, 2))
+
+    local HueCursorColor = Create("Frame", HueCursorBase, {
+        Size = UDim2.new(1, 0, 1, 0),
+        BackgroundColor3 = Color3.new(1, 1, 1),
+        BorderSizePixel = 0
+    })
+    Make("Corner", HueCursorColor, UDim.new(0, 2))
+
+    local HueGradient = Create("UIGradient", HueCursorColor, {
+        Color = ColorSequence.new(Default, Default)
     })
 
     local RainbowBtn = Create("TextButton", PickerPanel, {
@@ -2776,45 +2791,30 @@ function Tab:AddColorPicker(Configs)
     })
     Make("Corner", RainbowBtn, UDim.new(0, 3))
 
-    -- Hàm cập nhật màu toàn diện
     local function UpdateColor(isCallback)
         local FinalColor = Color3.fromHSV(h, s, v)
         
-        -- Cập nhật màu các thành phần UI
         SatGrid.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
         ColorIcon.ImageColor3 = FinalColor
-        PickerPanel.BorderColor3 = FinalColor -- Đổi màu viền bảng theo màu đang chọn
-        HueCursor.BackgroundColor3 = FinalColor -- Đổi màu thanh kế bên
+        PickerPanel.BorderColor3 = FinalColor
+        
+        -- Cập nhật Gradient cho thanh trượt và nút Rainbow
+        HueGradient.Color = ColorSequence.new(FinalColor)
         
         if IsRainbow then
-            RainbowBtn.TextColor3 = FinalColor -- Chữ Rainbow đổi màu nếu đang bật
+            RainbowBtn.TextColor3 = FinalColor
         else
             RainbowBtn.TextColor3 = Color3.new(1, 1, 1)
         end
 
         Cursor.Position = UDim2.fromScale(s, 1 - v)
-        HueCursor.Position = UDim2.fromScale(0.5, 1 - h)
+        HueCursorBase.Position = UDim2.fromScale(0.5, 1 - h)
         
         if isCallback then
             SetFlag(Flag, FinalColor)
             Funcs:FireCallback(Callback, FinalColor)
         end
     end
-
-    RainbowBtn.MouseButton1Click:Connect(function()
-        IsRainbow = not IsRainbow
-        RainbowBtn.BackgroundColor3 = IsRainbow and Color3.fromRGB(45, 45, 45) or Color3.fromRGB(35, 35, 35)
-        
-        if IsRainbow then
-            RainbowConnection = RunService.RenderStepped:Connect(function()
-                h = (tick() % 5) / 5
-                UpdateColor(true)
-            end)
-        else
-            if RainbowConnection then RainbowConnection:Disconnect() end
-            UpdateColor(false)
-        end
-    end)
 
     local function HandleInput(obj, callback)
         obj.InputBegan:Connect(function(input)
@@ -2824,7 +2824,6 @@ function Tab:AddColorPicker(Configs)
                     RainbowBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
                     if RainbowConnection then RainbowConnection:Disconnect() end
                 end
-                
                 local moveCon; moveCon = UserInputService.InputChanged:Connect(function(move)
                     if move.UserInputType == Enum.UserInputType.MouseMovement or move.UserInputType == Enum.UserInputType.Touch then
                         callback(UserInputService:GetMouseLocation())
@@ -2852,6 +2851,20 @@ function Tab:AddColorPicker(Configs)
         UpdateColor(true)
     end)
 
+    RainbowBtn.MouseButton1Click:Connect(function()
+        IsRainbow = not IsRainbow
+        RainbowBtn.BackgroundColor3 = IsRainbow and Color3.fromRGB(45, 45, 45) or Color3.fromRGB(35, 35, 35)
+        if IsRainbow then
+            RainbowConnection = RunService.RenderStepped:Connect(function()
+                h = (tick() % 5) / 5
+                UpdateColor(true)
+            end)
+        else
+            if RainbowConnection then RainbowConnection:Disconnect() end
+            UpdateColor(false)
+        end
+    end)
+
     ColorIcon.Activated:Connect(function()
         local pos = ColorIcon.AbsolutePosition
         PickerPanel.Position = UDim2.fromOffset(pos.X - 215, pos.Y)
@@ -2860,10 +2873,11 @@ function Tab:AddColorPicker(Configs)
 
     local ColorPicker = {}
     function ColorPicker:Set(col) h, s, v = Color3.toHSV(col) UpdateColor(true) end
-  
+
 
     return ColorPicker
 end
+
 		function Tab:AddTextBox(Configs)
 			local TName = Configs[1] or Configs.Name or Configs.Title or "Text Box"
 			local TDesc = Configs.Desc or Configs.Description or ""
