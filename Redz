@@ -2719,8 +2719,8 @@ end
     })
     
     local PickerPanel = Create("Frame", NotifGui, {
-        Size = UDim2.new(0, 210, 0, 155),
-        BackgroundColor3 = Color3.fromRGB(20, 20, 20),
+        Size = UDim2.new(0, 210, 0, 160),
+        BackgroundColor3 = Color3.fromRGB(25, 25, 25),
         BorderSizePixel = 1,
         BorderColor3 = Color3.fromRGB(60, 60, 60),
         Visible = false,
@@ -2732,6 +2732,7 @@ end
     local IsRainbow = false
     local RainbowConnection
 
+    -- Bảng Saturation/Value
     local SatGrid = Create("ImageLabel", PickerPanel, {
         Size = UDim2.new(0, 150, 0, 120),
         Position = UDim2.fromOffset(10, 10),
@@ -2750,38 +2751,40 @@ end
         ZIndex = 205
     })
 
-    local HueSlider = Create("ImageLabel", PickerPanel, {
-        Size = UDim2.new(0, 15, 0, 120),
-        Position = UDim2.fromOffset(165, 10),
-        Image = "rbxassetid://4155806340",
+    --- [PHẦN NÂNG CẤP THANH BẢY MÀU] ---
+    local HueSliderBG = Create("Frame", PickerPanel, {
+        Size = UDim2.new(0, 18, 0, 120),
+        Position = UDim2.fromOffset(170, 10),
+        BackgroundColor3 = Color3.fromRGB(40, 40, 40), -- Viền xám bao quanh
+        BorderSizePixel = 0,
         ZIndex = 201
     })
-    
-    -- Thanh xám bên trong (Hue Cursor) có màu Gradient
-    local HueCursorBase = Create("Frame", HueSlider, {
-        Size = UDim2.new(1, 4, 0, 4),
+    Make("Corner", HueSliderBG, UDim.new(0, 4))
+
+    local HueSlider = Create("ImageLabel", HueSliderBG, {
+        Size = UDim2.new(1, -4, 1, -4),
+        Position = UDim2.fromScale(0.5, 0.5),
+        AnchorPoint = Vector2.new(0.5, 0.5),
+        Image = "rbxassetid://4155806340",
+        BackgroundTransparency = 1,
+        ZIndex = 202
+    })
+    Make("Corner", HueSlider, UDim.new(0, 2))
+
+    -- Nút trượt bao quanh thanh màu (Hue Cursor)
+    local HueCursor = Create("Frame", HueSlider, {
+        Size = UDim2.new(1, 4, 0, 6),
         Position = UDim2.fromScale(0.5, 1 - h),
         AnchorPoint = Vector2.new(0.5, 0.5),
-        BackgroundColor3 = Color3.fromRGB(40, 40, 40), -- Màu xám nền
-        BorderSizePixel = 0,
+        BackgroundColor3 = Default,
         ZIndex = 205
     })
-    Make("Corner", HueCursorBase, UDim.new(0, 2))
-
-    local HueCursorColor = Create("Frame", HueCursorBase, {
-        Size = UDim2.new(1, 0, 1, 0),
-        BackgroundColor3 = Color3.new(1, 1, 1),
-        BorderSizePixel = 0
-    })
-    Make("Corner", HueCursorColor, UDim.new(0, 2))
-
-    local HueGradient = Create("UIGradient", HueCursorColor, {
-        Color = ColorSequence.new(Default, Default)
-    })
+    Make("Corner", HueCursor, UDim.new(0, 2))
+    Create("UIStroke", HueCursor, { Color = Color3.new(0, 0, 0), Thickness = 1 })
 
     local RainbowBtn = Create("TextButton", PickerPanel, {
         Size = UDim2.new(0, 190, 0, 18),
-        Position = UDim2.fromOffset(10, 132),
+        Position = UDim2.fromOffset(10, 135),
         BackgroundColor3 = Color3.fromRGB(35, 35, 35),
         Text = "Rainbow Mode",
         TextColor3 = Color3.new(1, 1, 1),
@@ -2793,22 +2796,22 @@ end
 
     local function UpdateColor(isCallback)
         local FinalColor = Color3.fromHSV(h, s, v)
+        local PureHue = Color3.fromHSV(h, 1, 1)
         
-        SatGrid.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
+        SatGrid.BackgroundColor3 = PureHue
         ColorIcon.ImageColor3 = FinalColor
         PickerPanel.BorderColor3 = FinalColor
-        
-        -- Cập nhật Gradient cho thanh trượt và nút Rainbow
-        HueGradient.Color = ColorSequence.new(FinalColor)
+        HueCursor.BackgroundColor3 = PureHue -- Nút trượt đổi theo Hue nguyên bản
         
         if IsRainbow then
             RainbowBtn.TextColor3 = FinalColor
+            RainbowBtn.BorderColor3 = FinalColor
         else
             RainbowBtn.TextColor3 = Color3.new(1, 1, 1)
         end
 
         Cursor.Position = UDim2.fromScale(s, 1 - v)
-        HueCursorBase.Position = UDim2.fromScale(0.5, 1 - h)
+        HueCursor.Position = UDim2.fromScale(0.5, 1 - h)
         
         if isCallback then
             SetFlag(Flag, FinalColor)
@@ -2871,13 +2874,26 @@ end
         PickerPanel.Visible = not PickerPanel.Visible
     end)
 
+    -- Tự động đóng UI khi chạm ra ngoài
+    UserInputService.InputBegan:Connect(function(input)
+        if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and PickerPanel.Visible then
+            local m = UserInputService:GetMouseLocation()
+            local p, s_p = PickerPanel.AbsolutePosition, PickerPanel.AbsoluteSize
+            if not (m.X >= p.X and m.X <= p.X + s_p.X and m.Y >= p.Y + 36 and m.Y <= p.Y + s_p.Y + 36) then
+                local ip, is = ColorIcon.AbsolutePosition, ColorIcon.AbsoluteSize
+                if not (m.X >= ip.X and m.X <= ip.X + is.X and m.Y >= ip.Y + 36 and m.Y <= ip.Y + is.Y + 36) then
+                    PickerPanel.Visible = false
+                end
+            end
+        end
+    end)
+
     local ColorPicker = {}
     function ColorPicker:Set(col) h, s, v = Color3.toHSV(col) UpdateColor(true) end
 
-
     return ColorPicker
 end
-
+            
 		function Tab:AddTextBox(Configs)
 			local TName = Configs[1] or Configs.Name or Configs.Title or "Text Box"
 			local TDesc = Configs.Desc or Configs.Description or ""
