@@ -1479,7 +1479,7 @@ function redzlib:MakeNotification(data)
 		end)
 	end)
 end
-function redzlib:MakeLoaing(Configs)
+function redzlib:MakeLoading(Configs)
 local LTitle = Configs[1] or Configs.Name or Configs.Title or "redz Library V5"
 local LDuration = Configs[2] or Configs.Duration or 3
 
