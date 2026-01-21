@@ -2879,9 +2879,9 @@ end
         if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and PickerPanel.Visible then
             local m = UserInputService:GetMouseLocation()
             local p, s_p = PickerPanel.AbsolutePosition, PickerPanel.AbsoluteSize
-            if not (m.X >= p.X and m.X <= p.X + s_p.X and m.Y >= p.Y + 45 and m.Y <= p.Y + s_p.Y + 36) then
+            if not (m.X >= p.X and m.X <= p.X + s_p.X and m.Y >= p.Y + 42 and m.Y <= p.Y + s_p.Y + 42) then
                 local ip, is = ColorIcon.AbsolutePosition, ColorIcon.AbsoluteSize
-                if not (m.X >= ip.X and m.X <= ip.X + is.X and m.Y >= ip.Y + 45 and m.Y <= ip.Y + is.Y + 36) then
+                if not (m.X >= ip.X and m.X <= ip.X + is.X and m.Y >= ip.Y + 42 and m.Y <= ip.Y + is.Y + 42) then
                     PickerPanel.Visible = false
                 end
             end
