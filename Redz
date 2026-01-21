@@ -1493,6 +1493,7 @@ Name = "LoadingHubText",
 Size = UDim2.new(1, 0, 1, 0),
 Position = UDim2.new(0, 0, 0, 0),
 TextColor3 = Theme["Color Text"],
+BackgroundColor3 = Color3.fromRGB(0,0,0),
 Font = 'GothamBold',
 TextSize = 30,
 Text = LTitle,
@@ -1511,8 +1512,15 @@ Text = "Loading...",
 TextTransparency = 1,
 BackgroundTransparency = 1
 })
-
-
+CreateTween({LoadingHubText, "TextTransparency", 0, 0.2})
+CreateTween({LoadingHubText, "BackgroundTransparency", 0.75, 0.2})
+CreateTween({LoadingText, "TextTransparency", 0, 0.2})
+wait(LDuration)
+CreateTween({LoadingHubText, "TextTransparency", 1, 0.2})
+CreateTween({LoadingHubText, "BackgroundTransparency", 1, 0.2})
+CreateTween({LoadingText, "TextTransparency", 1, 0.2})
+wait(0.3)
+LoadingUI:Destroy()
 end
 function redzlib:MakeWindow(Configs)
 	local WTitle = Configs[1] or Configs.Name or Configs.Title or "redz Library V5"
