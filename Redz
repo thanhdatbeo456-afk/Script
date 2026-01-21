@@ -1679,13 +1679,13 @@ function redzlib:MakeWindow(Configs)
 		WaitClick = true
 		
 		if Minimized then
-			MinimizeButton.Image = "rbxassetid://110657725541747"
+			MinimizeButton.Image = "rbxassetid://10734896206"
 			CreateTween({MainFrame, "Size", SaveSize, 0.25, true})
 			ControlSize1.Visible = true
 			ControlSize2.Visible = true
 			Minimized = false
 		else
-			MinimizeButton.Image = "rbxassetid://110657725541747"
+			MinimizeButton.Image = "rbxassetid://10734896206"
 			SaveSize = MainFrame.Size
 			ControlSize1.Visible = false
 			ControlSize2.Visible = false
@@ -2879,9 +2879,9 @@ end
         if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and PickerPanel.Visible then
             local m = UserInputService:GetMouseLocation()
             local p, s_p = PickerPanel.AbsolutePosition, PickerPanel.AbsoluteSize
-            if not (m.X >= p.X and m.X <= p.X + s_p.X and m.Y >= p.Y + 36 and m.Y <= p.Y + s_p.Y + 36) then
+            if not (m.X >= p.X and m.X <= p.X + s_p.X and m.Y >= p.Y + 45 and m.Y <= p.Y + s_p.Y + 36) then
                 local ip, is = ColorIcon.AbsolutePosition, ColorIcon.AbsoluteSize
-                if not (m.X >= ip.X and m.X <= ip.X + is.X and m.Y >= ip.Y + 36 and m.Y <= ip.Y + is.Y + 36) then
+                if not (m.X >= ip.X and m.X <= ip.X + is.X and m.Y >= ip.Y + 45 and m.Y <= ip.Y + is.Y + 36) then
                     PickerPanel.Visible = false
                 end
             end
