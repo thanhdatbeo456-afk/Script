@@ -2101,7 +2101,7 @@ function Tab:AddCheckbox(Configs)
 	})
 
     local StrokeMark = Create("UIStroke", CheckMark, {
-        Transparency = 0.3,
+        Transparency = 0,
         Color = Theme["Color Theme"]
     })
 
@@ -2119,10 +2119,12 @@ function Tab:AddCheckbox(Configs)
             CreateTween({CheckMark, "Size", UDim2.new(0.7, 0, 0.7, 0), 0.2})
             CreateTween({CheckMark, "BackgroundTransparency", 0, 0.2})
             CreateTween({CheckboxHolder, "BackgroundTransparency", 0, 0.2})
+            CreateTween({StrokeMark, "Transparency", 0.3, 0.2})
         else
             CreateTween({CheckMark, "Size", UDim2.new(0, 0, 0, 0), 0.2})
             CreateTween({CheckMark, "BackgroundTransparency", 1, 0.2})
             CreateTween({CheckboxHolder, "BackgroundTransparency", 0.5, 0.2})
+            CreateTween({StrokeMark, "Transparency", 0, 0.2})
         end
         WaitClick = false
     end
