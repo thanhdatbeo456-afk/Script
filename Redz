@@ -2712,16 +2712,16 @@ function Tab:AddColorPicker(Configs)
         Position = UDim2.new(1, -10, 0.5),
         AnchorPoint = Vector2.new(1, 0.5),
         BackgroundTransparency = 1,
-        Image = "rbxassetid://10734942201",
+        Image = "rbxassetid://6031225818",
         ImageColor3 = Default,
-        ZIndex = 5
+        ZIndex = 10
     })
     
     local PickerPanel = Create("Frame", NotifGui, {
-        Size = UDim2.new(0, 210, 0, 140),
-        BackgroundColor3 = Color3.fromRGB(25, 25, 25),
+        Size = UDim2.new(0, 210, 0, 155),
+        BackgroundColor3 = Color3.fromRGB(20, 20, 20),
         BorderSizePixel = 1,
-        BorderColor3 = Color3.fromRGB(60, 60, 60),
+        BorderColor3 = Default, -- Viền bảng màu khởi tạo theo Default
         Visible = false,
         ZIndex = 200
     })
@@ -2729,6 +2729,7 @@ function Tab:AddColorPicker(Configs)
 
     local h, s, v = Color3.toHSV(Default)
     local RainbowConnection = nil
+    local IsRainbow = false
 
     local SatGrid = Create("ImageLabel", PickerPanel, {
         Size = UDim2.new(0, 150, 0, 120),
@@ -2759,14 +2760,38 @@ function Tab:AddColorPicker(Configs)
         Size = UDim2.new(1, 4, 0, 2),
         Position = UDim2.fromScale(0.5, 1 - h),
         AnchorPoint = Vector2.new(0.5, 0.5),
-        BackgroundColor3 = Color3.new(1, 1, 1),
+        BackgroundColor3 = Default, -- Thanh trượt đổi màu
         ZIndex = 205
     })
 
+    local RainbowBtn = Create("TextButton", PickerPanel, {
+        Size = UDim2.new(0, 190, 0, 18),
+        Position = UDim2.fromOffset(10, 132),
+        BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+        Text = "Rainbow Mode",
+        TextColor3 = Color3.new(1, 1, 1),
+        Font = Enum.Font.GothamBold,
+        TextSize = 11,
+        ZIndex = 201
+    })
+    Make("Corner", RainbowBtn, UDim.new(0, 3))
+
+    -- Hàm cập nhật màu toàn diện
     local function UpdateColor(isCallback)
         local FinalColor = Color3.fromHSV(h, s, v)
+        
+        -- Cập nhật màu các thành phần UI
         SatGrid.BackgroundColor3 = Color3.fromHSV(h, 1, 1)
         ColorIcon.ImageColor3 = FinalColor
+        PickerPanel.BorderColor3 = FinalColor -- Đổi màu viền bảng theo màu đang chọn
+        HueCursor.BackgroundColor3 = FinalColor -- Đổi màu thanh kế bên
+        
+        if IsRainbow then
+            RainbowBtn.TextColor3 = FinalColor -- Chữ Rainbow đổi màu nếu đang bật
+        else
+            RainbowBtn.TextColor3 = Color3.new(1, 1, 1)
+        end
+
         Cursor.Position = UDim2.fromScale(s, 1 - v)
         HueCursor.Position = UDim2.fromScale(0.5, 1 - h)
         
@@ -2776,29 +2801,42 @@ function Tab:AddColorPicker(Configs)
         end
     end
 
+    RainbowBtn.MouseButton1Click:Connect(function()
+        IsRainbow = not IsRainbow
+        RainbowBtn.BackgroundColor3 = IsRainbow and Color3.fromRGB(45, 45, 45) or Color3.fromRGB(35, 35, 35)
+        
+        if IsRainbow then
+            RainbowConnection = RunService.RenderStepped:Connect(function()
+                h = (tick() % 5) / 5
+                UpdateColor(true)
+            end)
+        else
+            if RainbowConnection then RainbowConnection:Disconnect() end
+            UpdateColor(false)
+        end
+    end)
+
     local function HandleInput(obj, callback)
         obj.InputBegan:Connect(function(input)
             if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                local function ProcessInput()
-                    local mPos = UserInputService:GetMouseLocation()
-                    callback(mPos)
+                if IsRainbow then 
+                    IsRainbow = false
+                    RainbowBtn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+                    if RainbowConnection then RainbowConnection:Disconnect() end
                 end
                 
-                local moveCon = UserInputService.InputChanged:Connect(function(move)
+                local moveCon; moveCon = UserInputService.InputChanged:Connect(function(move)
                     if move.UserInputType == Enum.UserInputType.MouseMovement or move.UserInputType == Enum.UserInputType.Touch then
-                        ProcessInput()
+                        callback(UserInputService:GetMouseLocation())
                     end
                 end)
-                
-                local endCon
-                endCon = UserInputService.InputEnded:Connect(function(up)
+                local endCon; endCon = UserInputService.InputEnded:Connect(function(up)
                     if up.UserInputType == Enum.UserInputType.MouseButton1 or up.UserInputType == Enum.UserInputType.Touch then
                         moveCon:Disconnect()
                         endCon:Disconnect()
                     end
                 end)
-                
-                ProcessInput() -- Update ngay lập tức khi vừa chạm vào
+                callback(UserInputService:GetMouseLocation())
             end
         end)
     end
@@ -2820,22 +2858,9 @@ function Tab:AddColorPicker(Configs)
         PickerPanel.Visible = not PickerPanel.Visible
     end)
 
-    UserInputService.InputBegan:Connect(function(input)
-        if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) and PickerPanel.Visible then
-            local m = UserInputService:GetMouseLocation()
-            local p, s_p = PickerPanel.AbsolutePosition, PickerPanel.AbsoluteSize
-            local inPanel = m.X >= p.X and m.X <= p.X + s_p.X and m.Y >= p.Y + 36 and m.Y <= p.Y + s_p.Y + 36
-            local i_p, i_s = ColorIcon.AbsolutePosition, ColorIcon.AbsoluteSize
-            local inIcon = m.X >= i_p.X and m.X <= i_p.X + i_s.X and m.Y >= i_p.Y + 36 and m.Y <= i_p.Y + i_s.Y + 36
-            
-            if not inPanel and not inIcon then
-                PickerPanel.Visible = false
-            end
-        end
-    end)
-
     local ColorPicker = {}
     function ColorPicker:Set(col) h, s, v = Color3.toHSV(col) UpdateColor(true) end
+  
 
     return ColorPicker
 end
