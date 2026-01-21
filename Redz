@@ -1485,6 +1485,7 @@ local LDuration = Configs[2] or Configs.Duration or 3
 
 local LoadingUI = Create("ScreenGui", {
 Name = 'Loading UI',
+IgnoreGuiInset = true,
 Parent = game:GetService("CoreGui")
 })
 
@@ -1495,7 +1496,7 @@ Position = UDim2.new(0, 0, 0, 0),
 TextColor3 = Theme["Color Text"],
 BackgroundColor3 = Color3.fromRGB(0,0,0),
 Font = 'GothamBold',
-TextSize = 30,
+TextSize = 60,
 Text = LTitle,
 TextTransparency = 1,
 BackgroundTransparency = 1
@@ -1504,22 +1505,22 @@ BackgroundTransparency = 1
 local LoadingText = Create("TextLabel", LoadingHubText, {
 Name = "LoadingText",
 Size = UDim2.new(0.15, 0, 0.15, 0),
-Position = UDim2.new(0.9, 0, 0.9, 0),
+Position = UDim2.new(0.89, 0, 0.9, 0),
 TextColor3 = Theme["Color Text"],
 Font = 'GothamBold',
-TextSize = 15,
+TextSize = 18,
 Text = "Loading...",
 TextTransparency = 1,
 BackgroundTransparency = 1
 })
-CreateTween({LoadingHubText, "TextTransparency", 0, 0.2})
-CreateTween({LoadingHubText, "BackgroundTransparency", 0.75, 0.2})
-CreateTween({LoadingText, "TextTransparency", 0, 0.2})
+CreateTween({LoadingHubText, "TextTransparency", 0, 0.5})
+CreateTween({LoadingHubText, "BackgroundTransparency", 0.75, 0.5})
+CreateTween({LoadingText, "TextTransparency", 0, 0.5})
 wait(LDuration)
-CreateTween({LoadingHubText, "TextTransparency", 1, 0.2})
-CreateTween({LoadingHubText, "BackgroundTransparency", 1, 0.2})
-CreateTween({LoadingText, "TextTransparency", 1, 0.2})
-wait(0.3)
+CreateTween({LoadingHubText, "TextTransparency", 1, 0.5})
+CreateTween({LoadingHubText, "BackgroundTransparency", 1, 0.5})
+CreateTween({LoadingText, "TextTransparency", 1, 0.5})
+wait(0.5)
 LoadingUI:Destroy()
 end
 function redzlib:MakeWindow(Configs)
