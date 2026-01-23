@@ -1,1 +1,66 @@
+local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/thanhdatbeo456-afk/Script/refs/heads/main/Redz"))()
 
+redzlib:MakeLoading({
+Title = "Bee Swarm Simulator | v0.1",
+Duration = 5
+end})
+redzlib:MakeNotification({
+Title = "Alert",
+Description = "Loaded"
+Duration = 3
+})
+local Window = redzlib:MakeWindow({
+  Title = "Bee Swarm Simulator",
+  SubTitle = "v0.1",
+  SaveFolder = "Redz | redz lib v5.lua"
+})
+
+Window:AddMinimizeButton({
+    Button = { Image = "", BackgroundTransparency = 0 },
+    Corner = { CornerRadius = UDim.new(0, 5) },
+})
+
+local Tabs = {
+Main = Window:MakeTab({"Main", "home"}),
+Shop = Window:MakeTab({"Shop", "coin"}),
+Teleport = Window:MakeTab({"Teleport", "compass"}),
+Setting = Window:MakeTab({"Setting", "settings"})
+}
+Tabs.Main:AddSection({"Farm"})
+local AutoToolCollect = Tabs.Main:AddCheckbox({
+  Name = "Auto Tool Collect",
+  Default = false,
+  Callback = function(v)
+_G.AutoToolCollect = v
+AutoAllCollectibles:Set(false)
+game:GetService("RunService").Stepped:Connect(function()
+if _G.AutoToolCollect then
+game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("ToolCollect"):FireServer()
+end
+end)
+end})
+Tabs.Main:AddSection({"Collectibles"})
+Tabs.Main:AddSlider({
+  Name = "Delay Collectibles",
+  Min = 0.3,
+  Max = 1,
+  Increase = 2,
+  Default = 0.3,
+  Callback = function(v)
+_G.DelayCollectibles = v
+end})
+local AutoAllCollectibles = Tabs.Main:AddCheckbox({
+  Name = "Auto All Collectibles",
+  Default = false,
+  Callback = function(v)
+_G.AutoAllCollectibles = v
+AutoToolCollect:Set(false)
+while _G.AutoCollectibles do
+for _,v in ipairs(game:GetService("Workspace").Collectibles:GetChildren()) do
+if v.Parent.Name == "Collectibles" and not v.Transparency > 0.7 then
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame - Vector3.new(0,0,0)
+end
+end
+wait(1)
+end
+end})
