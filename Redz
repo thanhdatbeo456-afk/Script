@@ -2655,7 +2655,12 @@ end
 				Size = UDim2.fromScale(0.3, 1),
 				BorderSizePixel = 0
 			}), "Theme")Make("Corner", Indicator)
-			
+
+            local UiStroke = Create("UIStroke", Indicator, {
+                Color = Theme["Color Theme"],
+                Transparency = 0.4
+            })
+
 			local SliderIcon = Create("Frame", SliderBar, {
 				Size = UDim2.new(0, 6, 0, 12),
 				BackgroundColor3 = Color3.fromRGB(220, 220, 220),
