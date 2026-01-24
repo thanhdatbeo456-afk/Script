@@ -1,0 +1,53 @@
+local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/thanhdatbeo456-afk/Script/refs/heads/main/Redz"))()
+redzlib:MakeLoading({
+Title = "Hanto | v0.1",
+Duration = 5
+})
+local Window = redzlib:MakeWindow({
+  Title = "Hanto",
+  SubTitle = "v0.1",
+  SaveFolder = "Redz | redz lib v5.lua"
+})
+
+Window:AddMinimizeButton({
+    Button = { Image = "", BackgroundTransparency = 0 },
+    Corner = { CornerRadius = UDim.new(35, 1) },
+})
+
+local Tabs = {
+Main = Window:MakeTab({"Main", "home"}),
+Setting = Window:MakeTab({"Setting", "settings"})
+}
+Tabs.Main:AddSection({"Farm"})
+Tabs.Main:AddCheckbox({
+  Name = "Auto Farm Coins",
+  Default = false,
+  Callback = function(v)
+_G.AutoFarmCoins = v
+game:GetService("RunService").Stepped:Connect(function()
+if _G.AutoFarmCoins then
+for _,v in ipairs(workspace.CoinsFolder:GetChildren()) do
+if v.Parent.Name == "CoinsFolder" then
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame - Vector3.new(0,15,0)
+v.Size = Vector3.new(100,100,100)
+end
+end
+end
+end)
+end})
+Tabs.Main:AddCheckbox({
+  Name = "Auto Farm Soul Coins",
+  Default = false,
+  Callback = function(v)
+_G.AutoFarmSoulCoins = v
+game:GetService("RunService").Stepped:Connect(function()
+if _G.AutoFarmSoulCoins then
+for _,v in ipairs(workspace.SoulCoinsFolder:GetChildren()) do
+if v.Parent.Name == "SoulCoinsFolder" then
+game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame - Vector3.new(0,15,0)
+v.Size = Vector3.new(100,100,100)
+end
+end
+end
+end)
+end})
