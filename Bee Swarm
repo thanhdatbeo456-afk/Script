@@ -3,7 +3,7 @@ local redzlib = loadstring(game:HttpGet("https://raw.githubusercontent.com/thanh
 redzlib:MakeLoading({
 Title = "Bee Swarm Simulator | v0.1",
 Duration = 5
-end})
+})
 redzlib:MakeNotification({
 Title = "Alert",
 Description = "Loaded"
@@ -27,6 +27,47 @@ Teleport = Window:MakeTab({"Teleport", "compass"}),
 Setting = Window:MakeTab({"Setting", "settings"})
 }
 Tabs.Main:AddSection({"Farm"})
+game:GetService("RunService").Stepped:Connect(function()
+if autofarm and field then
+            if data.Stats.Pollen >= data.Stats.Capacity then
+                -- Teleport to hive
+                local hivePad = workspace.Hives[data.Info.Hive].Pad
+                if hivePad then
+                    -- Create platform once
+                    if not teleportPlatform then
+                        teleportPlatform = Instance.new("Part")
+                        teleportPlatform.Name = "HiveTeleportPlatform"
+                        teleportPlatform.Size = Vector3.new(10,1,10)
+                        teleportPlatform.Anchored = true
+                        teleportPlatform.CanCollide = true
+                        teleportPlatform.Position = hivePad.Position + Vector3.new(0,8,14)
+                        teleportPlatform.Parent = workspace
+                    end
+                    -- Move player to platform
+                    hrp.CFrame = CFrame.new(teleportPlatform.Position + Vector3.new(0,3,0))
+                    -- Convert at hive
+                    if not data.Info.Converting then
+                        replicatedStorage.Remotes.Hive:FireServer({Action = "Convert"})
+                    end
+                end
+end)
+local fields = {}
+for i,v in workspace.Fields:GetChildren() do
+    table.insert(fields,v.Name)
+end
+Tabs.Main:AddDropdown({
+  Name = "Select Field",
+  Options = {fields},
+  Default = "",
+  Callback = function(v)
+_G.SelectFieldFarm = v
+end})
+Tabs.Main:AddCheckbox({
+  Name = "Auto Farm",
+  Default = false,
+  Callback = function(v)
+_G.AutoFarm = v
+end})
 local AutoToolCollect = Tabs.Main:AddCheckbox({
   Name = "Auto Tool Collect",
   Default = false,
@@ -44,7 +85,7 @@ Tabs.Main:AddSlider({
   Name = "Delay Collectibles",
   Min = 0.3,
   Max = 1,
-  Increase = 2,
+  Increase = 0.1,
   Default = 0.3,
   Callback = function(v)
 _G.DelayCollectibles = v
@@ -57,7 +98,7 @@ _G.AutoAllCollectibles = v
 AutoToolCollect:Set(false)
 while _G.AutoCollectibles do
 for _,v in ipairs(game:GetService("Workspace").Collectibles:GetChildren()) do
-if v.Parent.Name == "Collectibles" and not v.Transparency > 0.7 then
+if v.Parent.Name == "Collectibles" and not v.Transparency => 0.7 then
 game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame - Vector3.new(0,0,0)
 end
 end
