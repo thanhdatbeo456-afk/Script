@@ -28,9 +28,8 @@ Setting = Window:MakeTab({"Setting", "settings"})
 }
 Tabs.Main:AddSection({"Farm"})
 game:GetService("RunService").Stepped:Connect(function()
-if autofarm and field then
-            if data.Stats.Pollen >= data.Stats.Capacity then
-                -- Teleport to hive
+if _G.AutoFarm and _G.SelectFieldFarm then
+if game:GetService("Players").LocalPlayer.CoreStats.Pollen.Value >= game:GetService("Players").LocalPlayer.CoreStats.Capacity.Value then
                 local hivePad = workspace.Hives[data.Info.Hive].Pad
                 if hivePad then
                     -- Create platform once
